@@ -34,6 +34,10 @@ public class MainActivity extends AppCompatActivity {
             Log.i(TAG,user.getName()+ "---------" + user.getId());
     }
 
+    private void greenTwo() {
+
+    }
+
 
 
 }
