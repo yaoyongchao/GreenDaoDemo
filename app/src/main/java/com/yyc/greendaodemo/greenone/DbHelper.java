@@ -3,6 +3,7 @@ package com.yyc.greendaodemo.greenone;
 import android.content.Context;
 
 import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
 import java.util.List;
 
 /**
@@ -17,9 +18,28 @@ public class DbHelper<T> {
     private Class<T> clazz;
 
     private Class<T> getClazz() {
-        if (clazz == null) {//获取泛型的Class对象
+        /*if (clazz == null) {//获取泛型的Class对象
             clazz = ((Class<T>) (((ParameterizedType) (this.getClass().getGenericSuperclass())).getActualTypeArguments()[0]));
         }
+        return clazz;*/
+
+        Type genType = getClass().getGenericSuperclass();
+        Type[] params = ((ParameterizedType) genType).getActualTypeArguments();
+        clazz = (Class) params[0];
+
+
+        //为了得到T的Class，采用如下方法
+        //1得到该泛型类的子类对象的Class对象
+        Class clz = this.getClass();
+        //2得到子类对象的泛型父类类型（也就是BaseDaoImpl<T>）
+        ParameterizedType type = (ParameterizedType) clz.getGenericSuperclass();
+        System.out.println(type);
+        //
+        Type[] types = type.getActualTypeArguments();
+
+        clazz = (Class<T>) types[0];
+        System.out.println(clazz.getSimpleName());
+
         return clazz;
     }
 
@@ -89,8 +109,9 @@ public class DbHelper<T> {
      * 列出所有
      * @return
      */
-    public List<T> listAll() {
+    public List<T> listAll(Class<T> cls) {
         return (List<T>) manager.getDaoSession().loadAll(getClazz());
+//        return (List<T>) manager.getDaoSession().loadAll(getClazz());
     }
 
     public T find(long id){
